@@ -8,23 +8,23 @@ public class Client {
 
 
     public static void main(String[] args) {
-        findPathAndPrint(A);
+        processPath(A);
     }
 
 
-    public static void findPathAndPrint(ArrayList<ArrayList<Object>> map) {
+    public static void processPath(ArrayList<ArrayList<Object>> map) {
         ArrayList<String> path = new ArrayList<>();
         boolean[][] visited = new boolean[map.size()][map.get(0).size()];
 
 
-        int[] start = findStart(map);
+        int[] start = locateStart(map);
         if (start == null) {
             System.out.println("No starting point found.");
             return;
         }
 
 
-        dfs(map, visited, start[0], start[1], path);
+        explore(map, visited, start[0], start[1], path);
 
 
         System.out.println("Path coordinates:");
@@ -36,24 +36,24 @@ public class Client {
     }
 
 
-    public static int[] findStart(ArrayList<ArrayList<Object>> map) {
+    public static int[] locateStart(ArrayList<ArrayList<Object>> map) {
         int rows = map.size();
         int cols = map.get(0).size();
 
 
         for (int col = 0; col < cols; col++) {
-            if (getValue(map, 0, col) == 1 && hasNeighbor(map, 0, col)) return new int[]{0, col};
-            if (getValue(map, rows - 1, col) == 1 && hasNeighbor(map, rows - 1, col)) return new int[]{rows - 1, col};
+            if (getValue(map, 0, col) == 1 && hasAdjacentOne(map, 0, col)) return new int[]{0, col};
+            if (getValue(map, rows - 1, col) == 1 && hasAdjacentOne(map, rows - 1, col)) return new int[]{rows - 1, col};
         }
         for (int row = 0; row < rows; row++) {
-            if (getValue(map, row, 0) == 1 && hasNeighbor(map, row, 0)) return new int[]{row, 0};
-            if (getValue(map, row, cols - 1) == 1 && hasNeighbor(map, row, cols - 1)) return new int[]{row, cols - 1};
+            if (getValue(map, row, 0) == 1 && hasAdjacentOne(map, row, 0)) return new int[]{row, 0};
+            if (getValue(map, row, cols - 1) == 1 && hasAdjacentOne(map, row, cols - 1)) return new int[]{row, cols - 1};
         }
         return null;
     }
 
 
-    public static boolean hasNeighbor(ArrayList<ArrayList<Object>> map, int row, int col) {
+    public static boolean hasAdjacentOne(ArrayList<ArrayList<Object>> map, int row, int col) {
         int rows = map.size();
         int cols = map.get(0).size();
         if (row > 0 && getValue(map, row - 1, col) == 1) return true;
@@ -78,7 +78,7 @@ public class Client {
     }
 
 
-    public static void dfs(ArrayList<ArrayList<Object>> map, boolean[][] visited, int row, int col, ArrayList<String> path) {
+    public static void explore(ArrayList<ArrayList<Object>> map, boolean[][] visited, int row, int col, ArrayList<String> path) {
         if (row < 0 || col < 0 || row >= map.size() || col >= map.get(0).size()) return;
         if (getValue(map, row, col) != 1 || visited[row][col]) return;
 
@@ -87,10 +87,10 @@ public class Client {
         path.add("A[" + row + "][" + col + "]");
 
 
-        if (row > 0 && getValue(map, row - 1, col) == 1 && !visited[row - 1][col]) dfs(map, visited, row - 1, col, path);
-        if (row < map.size() - 1 && getValue(map, row + 1, col) == 1 && !visited[row + 1][col]) dfs(map, visited, row + 1, col, path);
-        if (col > 0 && getValue(map, row, col - 1) == 1 && !visited[row][col - 1]) dfs(map, visited, row, col - 1, path);
-        if (col < map.get(0).size() - 1 && getValue(map, row, col + 1) == 1 && !visited[row][col + 1]) dfs(map, visited, row, col + 1, path);
+        if (row > 0 && getValue(map, row - 1, col) == 1 && !visited[row - 1][col]) explore(map, visited, row - 1, col, path);
+        if (row < map.size() - 1 && getValue(map, row + 1, col) == 1 && !visited[row + 1][col]) explore(map, visited, row + 1, col, path);
+        if (col > 0 && getValue(map, row, col - 1) == 1 && !visited[row][col - 1]) explore(map, visited, row, col - 1, path);
+        if (col < map.get(0).size() - 1 && getValue(map, row, col + 1) == 1 && !visited[row][col + 1]) explore(map, visited, row, col + 1, path);
     }
 
 
