@@ -1,21 +1,17 @@
 import java.util.ArrayList;
-
+import java.util.Arrays;
 
 public class Client {
 
-
     static ArrayList<ArrayList<Object>> A = MapProvider.getMap();
-
 
     public static void main(String[] args) {
         processPath(A);
     }
 
-
     public static void processPath(ArrayList<ArrayList<Object>> map) {
         ArrayList<String> path = new ArrayList<>();
         boolean[][] visited = new boolean[map.size()][map.get(0).size()];
-
 
         int[] start = locateStart(map);
         if (start == null) {
@@ -23,23 +19,18 @@ public class Client {
             return;
         }
 
-
         explore(map, visited, start[0], start[1], path);
-
 
         System.out.println("Path coordinates:");
         System.out.println(path);
-
 
         System.out.println("\nPath visualized:");
         printPath(map, path);
     }
 
-
     public static int[] locateStart(ArrayList<ArrayList<Object>> map) {
         int rows = map.size();
         int cols = map.get(0).size();
-
 
         for (int col = 0; col < cols; col++) {
             if (getValue(map, 0, col) == 1 && hasAdjacentOne(map, 0, col)) return new int[]{0, col};
@@ -52,7 +43,6 @@ public class Client {
         return null;
     }
 
-
     public static boolean hasAdjacentOne(ArrayList<ArrayList<Object>> map, int row, int col) {
         int rows = map.size();
         int cols = map.get(0).size();
@@ -62,7 +52,6 @@ public class Client {
         if (col < cols - 1 && getValue(map, row, col + 1) == 1) return true;
         return false;
     }
-
 
     public static int getValue(ArrayList<ArrayList<Object>> map, int row, int col) {
         try {
@@ -77,15 +66,12 @@ public class Client {
         }
     }
 
-
     public static void explore(ArrayList<ArrayList<Object>> map, boolean[][] visited, int row, int col, ArrayList<String> path) {
         if (row < 0 || col < 0 || row >= map.size() || col >= map.get(0).size()) return;
         if (getValue(map, row, col) != 1 || visited[row][col]) return;
 
-
         visited[row][col] = true;
         path.add("A[" + row + "][" + col + "]");
-
 
         if (row > 0 && getValue(map, row - 1, col) == 1 && !visited[row - 1][col]) explore(map, visited, row - 1, col, path);
         if (row < map.size() - 1 && getValue(map, row + 1, col) == 1 && !visited[row + 1][col]) explore(map, visited, row + 1, col, path);
@@ -93,10 +79,8 @@ public class Client {
         if (col < map.get(0).size() - 1 && getValue(map, row, col + 1) == 1 && !visited[row][col + 1]) explore(map, visited, row, col + 1, path);
     }
 
-
     public static void printPath(ArrayList<ArrayList<Object>> map, ArrayList<String> path) {
         String[][] display = new String[map.size()][map.get(0).size()];
-
 
         for (int i = 0; i < map.size(); i++) {
             for (int j = 0; j < map.get(0).size(); j++) {
@@ -110,7 +94,6 @@ public class Client {
             display[row][col] = "1";
         }
 
-
         for (String[] row : display) {
             for (String cell : row) {
                 System.out.print("[ " + cell + " ]");
@@ -119,4 +102,5 @@ public class Client {
         }
     }
 }
+ 
 
