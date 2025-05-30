@@ -1,124 +1,132 @@
 import java.util.ArrayList;
 
-
 public class Client {
-
-
-    static ArrayList<ArrayList<Object>> A = MapProvider.getMap();
-
+    private static ArrayList<ArrayList<Integer>> test_array_2 = MapProvider.getMap();
 
     public static void main(String[] args) {
-        findPathAndPrintout(A);
+        new Client().run();
     }
 
-
-    public static void findPathAndPrintout(ArrayList<ArrayList<Object>> map) {
-        ArrayList<String> path = new ArrayList<>();
-        boolean[][] visited = new boolean[map.size()][map.get(0).size()];
-
-
-        int[] start = Start(map);
-        if (start == null) {
-            System.out.println("No starting point found.");
-            return;
-        }
-
-
-        dfs(map, visited, start[0], start[1], path);
-
-
-        System.out.println("Path coordinates:");
-        System.out.println(path);
-
-
-        System.out.println("\nPath visualized:");
-        printPath(map, path);
+    public void run() {
+        ArrayList<String> path = findPath();
+        printPath(path);
+        printVisualMap(path);
     }
 
-
-    public static int[] Start(ArrayList<ArrayList<Object>> map) {
-        int rows = map.size();
-        int cols = map.get(0).size();
-
+    private ArrayList<String> findPath() {
+        ArrayList<int[]> starts = new ArrayList<>();
+        int rows = test_array_2.size();
+        int cols = test_array_2.get(0).size();
 
         for (int col = 0; col < cols; col++) {
-            if (getValue(map, 0, col) == 1 && hasNeighbor(map, 0, col)) return new int[]{0, col};
-            if (getValue(map, rows - 1, col) == 1 && hasNeighbor(map, rows - 1, col)) return new int[]{rows - 1, col};
+            if (test_array_2.get(0).get(col) == 1) starts.add(new int[]{0, col});
+            if (test_array_2.get(rows - 1).get(col) == 1) starts.add(new int[]{rows - 1, col});
         }
         for (int row = 0; row < rows; row++) {
-            if (getValue(map, row, 0) == 1 && hasNeighbor(map, row, 0)) return new int[]{row, 0};
-            if (getValue(map, row, cols - 1) == 1 && hasNeighbor(map, row, cols - 1)) return new int[]{row, cols - 1};
+            if (test_array_2.get(row).get(0) == 1) starts.add(new int[]{row, 0});
+            if (test_array_2.get(row).get(cols - 1) == 1) starts.add(new int[]{row, cols - 1});
         }
-        return null;
-    }
 
+        for (int[] start : starts) {
+            ArrayList<String> path = new ArrayList<>();
+            boolean[][] visited = new boolean[rows][cols];
 
-    public static boolean hasNeighbor(ArrayList<ArrayList<Object>> map, int row, int col) {
-        int rows = map.size();
-        int cols = map.get(0).size();
-        if (row > 0 && getValue(map, row - 1, col) == 1) return true;
-        if (row < rows - 1 && getValue(map, row + 1, col) == 1) return true;
-        if (col > 0 && getValue(map, row, col - 1) == 1) return true;
-        if (col < cols - 1 && getValue(map, row, col + 1) == 1) return true;
-        return false;
-    }
-
-
-    public static int getValue(ArrayList<ArrayList<Object>> map, int row, int col) {
-        try {
-            Object value = map.get(row).get(col);
-            if (value instanceof Integer) {
-                return (Integer) value;
-            } else {
-                return 0;
+            if (findPath(start[0], start[1], visited, path) && hasValidTurn(path)) {
+                return path;
             }
-        } catch (Exception e) {
-            return 0;
         }
+        return new ArrayList<>();
     }
 
+    private boolean findPath(int row, int col, boolean[][] visited, ArrayList<String> path) {
+        if (row < 0 || row >= test_array_2.size() || col < 0 || col >= test_array_2.get(0).size()) {
+            return isExitPoint(row, col, path);
+        }
 
-    public static void dfs(ArrayList<ArrayList<Object>> map, boolean[][] visited, int row, int col, ArrayList<String> path) {
-        if (row < 0 || col < 0 || row >= map.size() || col >= map.get(0).size()) return;
-        if (getValue(map, row, col) != 1 || visited[row][col]) return;
-
+        if (visited[row][col] || test_array_2.get(row).get(col) != 1) return false;
 
         visited[row][col] = true;
         path.add("A[" + row + "][" + col + "]");
 
+        if (isExitPoint(row, col, path)) return true;
 
-        if (row > 0 && getValue(map, row - 1, col) == 1 && !visited[row - 1][col]) dfs(map, visited, row - 1, col, path);
-        if (row < map.size() - 1 && getValue(map, row + 1, col) == 1 && !visited[row + 1][col]) dfs(map, visited, row + 1, col, path);
-        if (col > 0 && getValue(map, row, col - 1) == 1 && !visited[row][col - 1]) dfs(map, visited, row, col - 1, path);
-        if (col < map.get(0).size() - 1 && getValue(map, row, col + 1) == 1 && !visited[row][col + 1]) dfs(map, visited, row, col + 1, path);
+        int[][] directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        for (int[] dir : directions) {
+            if (findPath(row + dir[0], col + dir[1], visited, path)) return true;
+        }
+
+        path.remove(path.size() - 1);
+        return false;
     }
 
+    private boolean isExitPoint(int row, int col, ArrayList<String> path) {
+        if (path.size() < 2) return false;
 
-    public static void printPath(ArrayList<ArrayList<Object>> map, ArrayList<String> path) {
-        String[][] display = new String[map.size()][map.get(0).size()];
+        int rows = test_array_2.size();
+        int cols = test_array_2.get(0).size();
 
+        boolean onWall = (row < 0 || row >= rows || col < 0 || col >= cols);
+        if (!onWall) return false;
 
-        for (int i = 0; i < map.size(); i++) {
-            for (int j = 0; j < map.get(0).size(); j++) {
-                display[i][j] = " ";
+        int firstRow = Integer.parseInt(path.get(0).split("\\[|\\]")[1]);
+        boolean startedVertical = (firstRow == 0 || firstRow == rows - 1);
+
+        return startedVertical ? (col < 0 || col >= cols) : (row < 0 || row >= rows);
+    }
+
+    private boolean hasValidTurn(ArrayList<String> path) {
+        if (path.size() < 3) return false;
+
+        String[] first = path.get(0).split("\\[|\\]");
+        String[] second = path.get(1).split("\\[|\\]");
+        int row1 = Integer.parseInt(first[1]);
+        int row2 = Integer.parseInt(second[1]);
+        boolean initialVertical = (row1 != row2);
+
+        for (int i = 2; i < path.size(); i++) {
+            int currRow = Integer.parseInt(path.get(i).split("\\[|\\]")[1]);
+            int prevRow = Integer.parseInt(path.get(i - 1).split("\\[|\\]")[1]);
+            boolean currentVertical = (currRow != prevRow);
+            if (currentVertical != initialVertical) return true;
+        }
+        return false;
+    }
+
+    private void printPath(ArrayList<String> path) {
+        System.out.println("Path Coordinates:");
+        System.out.println(path.isEmpty() ? "No valid path" : path);
+    }
+
+    private void printVisualMap(ArrayList<String> path) {
+        System.out.println("\nVisual Representation of Path:");
+        if (path.isEmpty()) {
+            System.out.println("No path to display");
+            return;
+        }
+
+        int rows = test_array_2.size();
+        int cols = test_array_2.get(0).size();
+        String[][] grid = new String[rows][cols];
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                grid[i][j] = " ";
             }
         }
 
-
-        for (String pos : path) {
-            int row = Integer.parseInt(pos.substring(pos.indexOf('[') + 1, pos.indexOf(']')));
-            int col = Integer.parseInt(pos.substring(pos.lastIndexOf('[') + 1, pos.lastIndexOf(']')));
-            display[row][col] = "1";
+        for (String coord : path) {
+            String[] parts = coord.split("\\[|\\]");
+            int row = Integer.parseInt(parts[1]);
+            int col = Integer.parseInt(parts[3]);
+            grid[row][col] = "1";
         }
 
-
-        for (String[] row : display) {
-            for (String cell : row) {
-                System.out.print("[ " + cell + " ]");
+        for (String[] row : grid) {
+            System.out.print("[");
+            for (int i = 0; i < row.length; i++) {
+                System.out.print(row[i]);
+                if (i < row.length - 1) System.out.print(",");
             }
-            System.out.println();
+            System.out.println("]");
         }
     }
 }
-
- 
