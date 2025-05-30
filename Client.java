@@ -8,16 +8,16 @@ public class Client {
 
 
     public static void main(String[] args) {
-        findPathAndPrint(A);
+        findPathAndPrintout(A);
     }
 
 
-    public static void findPathAndPrint(ArrayList<ArrayList<Object>> map) {
+    public static void findPathAndPrintout(ArrayList<ArrayList<Object>> map) {
         ArrayList<String> path = new ArrayList<>();
         boolean[][] visited = new boolean[map.size()][map.get(0).size()];
 
 
-        int[] start = findStart(map);
+        int[] start = Start(map);
         if (start == null) {
             System.out.println("No starting point found.");
             return;
@@ -36,7 +36,7 @@ public class Client {
     }
 
 
-    public static int[] findStart(ArrayList<ArrayList<Object>> map) {
+    public static int[] Start(ArrayList<ArrayList<Object>> map) {
         int rows = map.size();
         int cols = map.get(0).size();
 
